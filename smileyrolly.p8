@@ -27,75 +27,79 @@ function moveanim()
 end
 
 function drawgameover()
-				spr(13, 30, 45)
-				spr(14, 38, 45)
-				spr(15, 46, 45)
-				spr(16, 54, 45)
-				spr(17, 62, 45)
-				spr(18, 70, 45)
-				spr(19, 78, 45)
-				spr(20, 86, 45)
-				spr(21, 94, 45)
+    spr(13, 30, 45)
+    spr(14, 38, 45)
+    spr(15, 46, 45)
+    spr(16, 54, 45)
+    spr(17, 62, 45)
+    spr(18, 70, 45)
+    spr(19, 78, 45)
+    spr(20, 86, 45)
+    spr(21, 94, 45)
 end
 
 function _draw()
     cls() -- clear screen
-    map(0,0,0,20,124,124)
+    map(0,0,0,20,124,124) -- draw background
     spr(player.sprite, player.x, player.y) -- draw sprite
     spr(badguy.sprite, badguy.x, badguy.y)
-				if gameover then
-								drawgameover()
-				end
+
+    if gameover then
+        drawgameover() -- draw gameover screen
+    end
 end
 
 function _update()
     player.moving = false
+
     if (btn(0)) then
-        player.x -= player.speed
+        player.x -= player.speed -- move left
         if player.x < -10 then
-            player.x = 128
+            player.x = 128 -- wrap screen
         end
         moveanim()
     end
+
     if (btn(1)) then
-        player.x += player.speed
+        player.x += player.speed -- move right
         if player.x > 128 then
-            player.x = -10
+            player.x = -10 -- wrap screen
         end
         moveanim()
     end
+
     if (btn(2)) then
-        player.jumping = true
+        player.jumping = true -- enter jump sequence
         player.jumpingup = true
     end
+
     if player.jumping then
-				    if player.jumpingup then
-				        player.y -= 2
-				    else
-				        player.y += 2
-				    end
-				    if player.y < 59 then
-				        player.jumpingup = false
-				    end
-				    if player.y > 65 then
-				        player.jumping = false
-				    end
+        if player.jumpingup then -- on his way up
+            player.y -= 2
+        else
+            player.y += 2 -- on his way down
+        end
+        if player.y < 59 then
+            player.jumpingup = false -- reached the top, head back down
+        end
+        if player.y > 65 then
+            player.jumping = false -- we've reached the ground
+        end
     end
 
     badguy.sprite += 1
     if badguy.sprite > 11 then
-    	   badguy.sprite = 9
+    	badguy.sprite = 9 -- loop through animation
     end
-    
-    badguy.x += badguy.speed
+
+    badguy.x += badguy.speed -- continually loop around screen
     if badguy.x > 128 then
        badguy.x = -10
     end
-    
-    if player.x == badguy.x and player.y == badguy.y then
-        gameover = true
-    end
 
+    if player.x == badguy.x and player.y == badguy.y then
+        gameover = true -- TODO: better collision detection
+    end
 end
 __gfx__
 00aaaa0000aaaa0000aaaa0000aaaa00bbbbbbbbccccccccccaaaacccccccccccccccccc00000000000000000000000000000000000000000000000000000000
