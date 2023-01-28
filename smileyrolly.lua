@@ -1,26 +1,35 @@
 
-local player = {}
+player = {}
 player.x = 0
-player.y = 67
+player.y = 27
+player.width = 8
+player.height = 8
 player.sprite = 0
 player.speed = 2
 player.jumping = false
 player.jumpingup = false
 
-local badguy = {}
-badguy.x = 64;
-badguy.y = 67;
-badguy.sprite = 9;
-badguy.speed = 2;
+badguy = {}
+badguy.x = 60
+badguy.y = 48
+badguy.width = 8
+badguy.height = 8
+badguy.sprite = 9
+badguy.speed = 2
 
-local badguy2 = {}
-badguy2.x = 64;
-badguy2.y = 67;
-badguy2.sprite = 22;
-badguy2.speed = 2;
+badguy2 = {}
+badguy2.x = 60
+badguy2.y = 48
+badguy2.width = 8
+badguy2.height = 8
+badguy2.sprite = 22
+badguy2.speed = 2
 
-local startscreen = true
-local gameover = false
+startscreen = true
+gameover = false
+
+map_x = 0
+map_x_offset = 0
 
 function moveanim()
     player.sprite += 1
@@ -30,15 +39,16 @@ function moveanim()
 end
 
 function jumpanim()
+    moveanim()
     if player.jumpingup then -- on his way up
         player.y -= 2
     else
         player.y += 2 -- on his way down
     end
-    if player.y < 59 then
+    if player.y < 25 then
         player.jumpingup = false -- reached the top, head back down
     end
-    if player.y > 65 then
+    if player.y > 48 then
         player.jumping = false -- we've reached the ground
     end
 end
@@ -88,9 +98,16 @@ function drawgameover()
     end
 end
 
+function aabb(a, b)
+    return a.x < b.x + b.width
+        and a.x + a.width > b.x
+        and a.y < b.y + b.height
+        and a.y + a.height > b.y
+end
+
 function _draw()
     cls() -- clear screen
-    map(0,0,0,20,124,124) -- draw background
+    map(0,0,map_x,0,1024,16)
 
     if startscreen then
         drawstartscreen()
@@ -104,6 +121,19 @@ function _draw()
 end
 
 function _update()
+    if (btnp(5)) then
+        if startscreen then
+            startscreen = false
+        end
+        player.jumping = true -- enter jump sequence
+        player.jumpingup = true
+    end
+
+    if startscreen then
+        return
+    end
+
+    map_x -= 1
     if (btn(0)) then
         player.x -= player.speed -- move left
         if player.x < -10 then
@@ -120,21 +150,17 @@ function _update()
         moveanim()
     end
 
-    if (btn(5)) then
-        if startscreen then
-            startscreen = false
-        end
-        player.jumping = true -- enter jump sequence
-        player.jumpingup = true
-    end
-
     if player.jumping then
         jumpanim()
     end
 
     badguyanim()
 
-    -- if player.x == badguy.x and player.y == badguy.y then
-    --     gameover = true -- TODO: better collision detection
-    -- end
+    if aabb(player, badguy) then
+        gameover = true
+    end
+
+    if aabb(player, badguy2) then
+        gameover = true
+    end
 end
